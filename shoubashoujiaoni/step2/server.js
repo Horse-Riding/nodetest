@@ -3,6 +3,24 @@ var path = require('path');
 var fs = require('fs');
 var url = require('url');
 
+// 路由
+var routes = {
+	'/a': function(req, res) {
+		res.end('match /a, query is:' + JSON.stringify(req.query))
+	},
+	'/b': function(req, res) {
+		res.end('match /b')
+	},
+	'/a/c': function(req, res) {
+		res.end('match /a/c')
+	},
+	'/search': function(req, res) {
+		res.end('username=' + req.body.username + ',password=' + req.body.password)
+	}
+}
+
+
+// 文件解析
 function staticRoot(staticPath, req, res) {
 	var pathObj = url.parse(req.url, true);
 	// 如果当前路径为/，则默认索引到index.html
@@ -30,8 +48,35 @@ function staticRoot(staticPath, req, res) {
 	})
 }
 var server = http.createServer(function(req, res) {
-	staticRoot(path.join(__dirname, 'static'), req, res)
+	// staticRoot(path.join(__dirname, 'static'), req, res)
+	routePath(req, res)
 })
 
+function routePath(req, res) {
+	var pathObj = url.parse(req.url, true)
+	// console.log(pathObj)
+	var handleFn = routes[pathObj.pathname]
+	if (handleFn) {
+		req.query = pathObj.query
+		var body = ''
+		req.on('data', function(chunk) {
+			body += chunk
+		}).on('end', function() {
+			req.body = parseBody(body)
+			handleFn(req, res)
+		})
+	} else {
+		staticRoot(path.resolve(__dirname, 'static'), req, res)
+	} 
+}
+function parseBody(body) {
+	console.log(1111);
+	var obj = {}
+	console.log(body);
+	body.split('&').forEach(function(str) {
+		obj[str.split('=')[0]] = str.split('=')[1]
+	})
+	return obj;
+}
 server.listen(8080)
 console.log('visit http://localhost:8080')
