@@ -1,0 +1,58 @@
+1、需求：制作一个基于后端的新闻发布系统
+2、功能
+
+		1）允许用户发布新闻
+		2）允许用户查看新闻（可以再首页浏览到最新的新闻）
+		3）允许用户操作删除功能
+		4）允许用户修改新闻
+		
+数据库设计
+		数据名：news
+		集合名：list
+		文档结构： 
+			标题		作者		来源		内容		时间		点击率	
+			title	author	from	content	intime	hits
+			String  String  String  String  String  Number
+
+第一部分：环境搭建
+	1.搭建express项目
+			1）
+				创建项目 express -e 项目名称
+			2)
+				安装依赖 cnpm i
+			3)
+				监听端口
+					在app.js中添加端口监听代码
+					app.listen(80)
+			4)	
+				运行项目
+					node app
+			5)  
+				测试项目
+					手动打开浏览器。输入网址：localhost
+	2.配置mongoose
+		1)
+			连接数据库
+				mongoose.connect('monngodb://127.0.0.1:27017/news',function(err) {
+					if (err) {
+						throw err;
+					} else {
+						console.log('数据库连接成功');
+					}
+				})
+		2）
+			创建骨架
+				var listSchema = new mongoose.Schema({
+					title: String,
+					author: String,
+					from: String,
+					content: String,
+					time: String,
+					hits: Number
+				})
+		3）
+			创建模型
+			
+				var listModel = mongoose.model(list, listSchema, list);
+		
+第二部分：实现功能
